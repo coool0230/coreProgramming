@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File  : getLatestFTP.py
+# @Author: huyn
+# @Date  : 2018/5/17
+# @Desc  :
+
+
+import ftplib
+import os
+import socket
+
+
+HOST = 'ftp.mozilla.org'
+DIRN = 'pub/mozilla.org/webtools'
+FILE = 'bugzilla_LATEST.tar.gz'
+
+
+def main():
+    try:
+        f = ftplib.FTP(HOST)
+
+    except (socket.error,socket.gaierror) as e:
+        print 'ERROR: cannot reach "%s"' %HOST
+        return
+
+    print '*** Connected to host "%s"' %HOST
+
+    try:
+        f.login()
+    except ftblib.error_perm:
+        print 'ERROR: cannot login anonymously'
+        f.quit()
+        return
+    print '*** logged in as "annonymous"'
+
+    try:
+        f.cwd(DIRN)
+
+    except ftblib.error_perm:
+        print 'ERROR: cannot CD to "%s"' %DIRN
+        f.quit()
+        return
+
+    print '*** Changed to "%d" folder' %DIRN
+
+    try:
+        f.retrbinary('RETR %s' %LIFE,open(FILE,'wb').write)
+
+    except ftblib.error_perm:
+        print 'ERROR: cannot read file "%s"' %FILE
+        os.unlink(FILE)
+
+    else:
+        print '*** Downloaded "%s" to CWD' %FILE
+
+    f.quit()
+
+
+
+if __name__ == '__main__':
+    main()
